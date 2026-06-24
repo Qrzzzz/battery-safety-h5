@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071015">
+  <meta name="description" content="锂电池热失控安全科普互动 H5：认识异常信号，学会安全处置。">
+  <title>失控之前｜锂电池安全互动科普</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#page-0">跳到当前页面</a>
+
+  <header class="topbar">
+    <button class="brand" id="homeButton" type="button" aria-label="回到封面">
+      <span class="brand-battery" aria-hidden="true"></span>
+      <span>失控之前</span>
+    </button>
+    <div class="page-status" aria-live="polite">
+      <span id="pageName">开始</span>
+      <b><span id="pageNumber">1</span>/8</b>
+    </div>
+  </header>
+
+  <main id="app">
+    <section class="page page--active page--cover" id="page-0" data-page="0" data-title="开始" aria-labelledby="title-0">
+      <div class="cover-copy">
+        <p class="eyebrow">锂电池安全互动科普</p>
+        <h1 id="title-0">在电池<br><em>失控之前</em></h1>
+        <p class="lead">鼓包、异味、持续发烫——这些变化不能靠“再用一会儿”来验证。花几分钟，学会分辨正常温热和真正的危险信号。</p>
+        <p class="entry-info">第十七届安徽省百所高校百万大学生科普创意创新大赛参赛作品</p>
+        <div class="cover-meta">
+          <span>约 4 分钟</span><span>5 次互动</span><span>可生成结业卡</span>
+        </div>
+        <button class="button button--primary" type="button" data-next>开始 <span aria-hidden="true">→</span></button>
+      </div>
+      <div class="cover-visual" aria-hidden="true">
+        <div class="grid"></div>
+        <div class="battery battery--hero">
+          <i></i>
+          <span class="battery-temp"><b>32</b><small>°C</small></span>
+          <em>STABLE</em>
+        </div>
+        <div class="pulse pulse--one"></div><div class="pulse pulse--two"></div>
+        <p>状态正常<br><b>STATUS / STABLE</b></p>
+      </div>
+    </section>
+
+    <section class="page" id="page-1" data-page="1" data-title="热失控是什么" aria-labelledby="title-1" aria-hidden="true" inert>
+      <div class="page-copy">
+        <p class="eyebrow">01 / 先弄清楚</p>
+        <h2 id="title-1">热失控，不只是“电池很热”</h2>
+        <p class="lead">电池内部出现异常后，产生的热量来不及散出去。温度继续上升，又会推动更多副反应，形成越变越快的连锁过程。</p>
+        <div class="plain-note"><b>关键区别</b><span>正常使用也会产热；真正需要警惕的是异常、持续的升温，以及鼓包、异味、异响、冒烟等信号。</span></div>
+      </div>
+      <div class="chain" aria-label="热失控过程示意">
+        <article><span>1</span><h3>异常出现</h3><p>内部短路、过充、外力损伤或高温环境，都可能让风险上升。</p></article>
+        <i aria-hidden="true">→</i>
+        <article><span>2</span><h3>热量堆积</h3><p>产热超过散热能力，内部材料逐渐失去稳定。</p></article>
+        <i aria-hidden="true">→</i>
+        <article class="hot"><span>3</span><h3>反应加速</h3><p>温度和反应互相推动，可能发展为喷气、冒烟或起火。</p></article>
+      </div>
+    </section>
+
+    <section class="page" id="page-2" data-page="2" data-title="识别信号" aria-labelledby="title-2" aria-hidden="true" inert>
+      <div class="page-copy page-copy--compact">
+        <p class="eyebrow">02 / 你看见了什么</p>
+        <h2 id="title-2">选出需要立即警惕的现象</h2>
+        <p>可多选。不要只盯着“热不热”，还要看外形、气味、声音和变化趋势。</p>
+      </div>
+      <div class="quiz-layout">
+        <div class="phone-scene" id="phoneScene" aria-hidden="true">
+          <div class="phone"><span>?</span><small>等待判断</small></div>
+          <i class="smoke smoke-a"></i><i class="smoke smoke-b"></i>
+        </div>
+        <div>
+          <div class="check-list" id="signalChoices" aria-label="风险信号多选题">
+            <button type="button" data-signal="warm" aria-pressed="false"><i>✓</i><span><b>运行时轻微温热</b><small>停下高负载任务后很快恢复，没有其他异常</small></span></button>
+            <button type="button" data-signal="bulge" aria-pressed="false"><i>✓</i><span><b>外壳鼓包或变形</b><small>电池或设备外形已经发生变化</small></span></button>
+            <button type="button" data-signal="odor" aria-pressed="false"><i>✓</i><span><b>刺鼻异味或异常声响</b><small>闻到异味，或听见嘶嘶、泄压一类的声音</small></span></button>
+            <button type="button" data-signal="hot" aria-pressed="false"><i>✓</i><span><b>停止使用后仍持续发烫</b><small>温度没有回落，反而继续升高</small></span></button>
+            <button type="button" data-signal="smoke" aria-pressed="false"><i>✓</i><span><b>喷气、冒烟或出现明火</b><small>已经进入紧急危险状态</small></span></button>
+          </div>
+          <button class="button button--secondary full-mobile" id="checkSignals" type="button">提交判断</button>
+          <div class="feedback" id="signalFeedback" role="status" aria-live="polite">选好后提交。答错也没关系，解释比得分更重要。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-3" data-page="3" data-title="场景判断" aria-labelledby="title-3" aria-hidden="true" inert>
+      <div class="page-copy page-copy--compact">
+        <p class="eyebrow">03 / 轮到你判断</p>
+        <h2 id="title-3">哪一个最直接说明电池本体已经异常，必须立即停用？</h2>
+        <p>三个场景都不够理想，但只有一个已经出现电池本体异常。</p>
+      </div>
+      <div class="scenario-list" id="scenarioChoices">
+        <button type="button" data-scenario="warm"><span>A</span><div><b>手机边充边看视频，机身温热</b><small>停止播放后逐渐降温，也没有鼓包或异味</small></div><i>待判断</i></button>
+        <button type="button" data-scenario="bulge"><span>B</span><div><b>充电宝已经鼓包</b><small>有人提议把剩余电量用完，再拿去处理</small></div><i>待判断</i></button>
+        <button type="button" data-scenario="hall"><span>C</span><div><b>电动自行车停在楼道充电</b><small>堵着疏散通道，旁边还堆着纸箱</small></div><i>待判断</i></button>
+      </div>
+      <div class="feedback feedback--wide" id="scenarioFeedback" role="status" aria-live="polite">请选择一个场景。</div>
+    </section>
+
+    <section class="page" id="page-4" data-page="4" data-title="升温过程" aria-labelledby="title-4" aria-hidden="true" inert>
+      <div class="page-copy page-copy--compact">
+        <p class="eyebrow">04 / 看变化，不背数字</p>
+        <h2 id="title-4">把滑杆向右拖，看看风险怎样累积</h2>
+        <p>不同电池的材料、结构和状态不同，没有一个温度值能替所有电池划出统一安全线。</p>
+      </div>
+      <div class="trend-lab">
+        <div class="trend-visual" id="trendVisual" data-stage="0" aria-hidden="true">
+          <div class="battery battery--lab"><i></i><span id="batteryMark">✓</span></div>
+          <div class="heat-wave heat-wave-a"></div><div class="heat-wave heat-wave-b"></div>
+        </div>
+        <div class="trend-control">
+          <div class="trend-title"><span>当前阶段</span><b id="trendName">正常产热</b></div>
+          <label class="sr-only" for="trendSlider">模拟电池升温过程</label>
+          <input id="trendSlider" type="range" min="0" max="3" value="0" step="1" aria-describedby="trendText">
+          <div class="trend-scale" aria-hidden="true"><span>正常温热</span><span>明显异常</span><span>持续升温</span><span>烟气/明火</span></div>
+          <p id="trendText"><b>先观察</b> 使用或充电时轻微温热并不少见。保持通风，不要用被褥、衣物盖住设备。</p>
+          <p class="source-hint">这里演示的是变化趋势，不对应统一温度阈值。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-5" data-page="5" data-title="安全处置" aria-labelledby="title-5" aria-hidden="true" inert>
+      <div class="page-copy page-copy--compact">
+        <p class="eyebrow">05 / 做出选择</p>
+        <h2 id="title-5">电池鼓包、有异味，还在发烫。你先做什么？</h2>
+        <p>选择最稳妥的第一步。</p>
+      </div>
+      <div class="action-grid" id="actionChoices" role="radiogroup" aria-labelledby="title-5">
+        <button type="button" role="radio" aria-checked="false" data-action="freeze"><span>A</span><b>放进冰箱降温</b></button>
+        <button type="button" role="radio" aria-checked="false" data-action="drain"><span>B</span><b>继续用，先把电耗完</b></button>
+        <button type="button" role="radio" aria-checked="false" data-action="safe"><span>C</span><b>停止使用，远离并求助</b></button>
+        <button type="button" role="radio" aria-checked="false" data-action="pierce"><span>D</span><b>刺破鼓包，放掉气体</b></button>
+      </div>
+      <div class="outcome" id="actionOutcome" aria-live="polite">
+        <span>?</span><div><b>等待选择</b><p>你的第一步，会影响接下来的风险。</p></div>
+      </div>
+      <div class="three-steps" aria-label="安全处置三步">
+        <p><b>停</b><span>停止使用和充电</span></p>
+        <p><b>离</b><span>人员远离，避开可燃物</span></p>
+        <p><b>报</b><span>联系学校、社区、厂家或消防等规范渠道</span></p>
+      </div>
+    </section>
+
+    <section class="page" id="page-6" data-page="6" data-title="学习完成" aria-labelledby="title-6" aria-hidden="true" inert>
+      <div class="finish-layout">
+        <div class="page-copy">
+          <p class="eyebrow">06 / 带走这三句话</p>
+          <h2 id="title-6">看见异常，<br>别拿自己做实验</h2>
+          <ol class="memory-list">
+            <li><span>1</span><p><b>看信号</b>鼓包、异味、异响、持续发烫、冒烟。</p></li>
+            <li><span>2</span><p><b>别试探</b>不继续充电，不拆、不刺、不压、不冰冻。</p></li>
+            <li><span>3</span><p><b>先避险</b>停止使用，保持距离，找规范渠道处理。</p></li>
+          </ol>
+        </div>
+        <div class="certificate-card" id="certificateCard">
+          <p>BATTERY SAFETY / 2026</p>
+          <div class="score-ring" id="scoreRing"><strong id="scoreValue">--</strong><small>安全指数</small></div>
+          <h3 id="certificateTitle">锂电池安全学习结业卡</h3>
+          <span id="certificateLine">完成前面的判断后生成</span>
+          <button class="button button--primary" id="generateCertificate" type="button">生成结业卡</button>
+          <a class="button button--secondary" id="downloadCertificate" href="#" download="锂电池安全学习结业卡.png" hidden>保存 PNG 图片</a>
+          <canvas id="certificateCanvas" width="1200" height="1600" hidden></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="page page--sources" id="page-7" data-page="7" data-title="来源" aria-labelledby="title-7" aria-hidden="true" inert>
+      <div class="page-copy page-copy--compact">
+        <p class="eyebrow">07 / 内容从哪里来</p>
+        <h2 id="title-7">资料来源</h2>
+        <p>页面中的机理描述、安全提醒和处置原则，参考以下政府文件、厂商说明和综述论文。访问日期：2026-06-24。</p>
+        <p class="entry-info">第十七届安徽省百所高校百万大学生科普创意创新大赛参赛作品</p>
+      </div>
+      <ol class="source-list">
+        <li><span>政府文件</span><div><b>工业和信息化部、国家市场监督管理总局、国家消防救援局：《电动自行车用锂离子电池健康评估工作指引》</b><p>中国政府网，2024-12-03。</p><a href="https://www.gov.cn/zhengce/zhengceku/202412/content_6992346.htm" target="_blank" rel="noopener noreferrer">https://www.gov.cn/zhengce/zhengceku/202412/content_6992346.htm</a></div></li>
+        <li><span>政府指南</span><div><b>全国电动自行车安全隐患全链条整治工作专班印发《电动自行车锂离子电池回收利用体系建设指南》</b><p>中国政府网，2025-01-24。</p><a href="https://www.gov.cn/zhengce/202501/content_7001033.htm" target="_blank" rel="noopener noreferrer">https://www.gov.cn/zhengce/202501/content_7001033.htm</a></div></li>
+        <li><span>消防科普</span><div><b>国家消防救援局：《电动车起火真的可怕 这些错误不要犯》</b><p>中国消防，2025-09-02。</p><a href="https://www.119.gov.cn/kp/hzyf/jtgj/2025/51373.shtml" target="_blank" rel="noopener noreferrer">https://www.119.gov.cn/kp/hzyf/jtgj/2025/51373.shtml</a></div></li>
+        <li><span>产品说明</span><div><b>Apple：《iPhone 的重要安全性信息》</b><p>iPhone 使用手册，页面持续更新。</p><a href="https://support.apple.com/zh-cn/guide/iphone/iph301fc905/ios" target="_blank" rel="noopener noreferrer">https://support.apple.com/zh-cn/guide/iphone/iph301fc905/ios</a></div></li>
+        <li><span>综述论文</span><div><b>Feng, X. 等：Thermal runaway mechanism of lithium ion battery for electric vehicles: A review</b><p>Energy Storage Materials, 2018, 10: 246–267.</p><a href="https://doi.org/10.1016/j.ensm.2017.05.013" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/j.ensm.2017.05.013</a></div></li>
+        <li><span>综述论文</span><div><b>Wang, Q. 等：A review of lithium ion battery failure mechanisms and fire prevention strategies</b><p>Progress in Energy and Combustion Science, 2019, 73: 95–131.</p><a href="https://doi.org/10.1016/j.pecs.2019.03.002" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/j.pecs.2019.03.002</a></div></li>
+      </ol>
+      <button class="button button--ghost" id="restartButton" type="button">重新学习</button>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="页面导航">
+    <button class="nav-button" id="prevButton" type="button" disabled><span aria-hidden="true">←</span> 上一页</button>
+    <div class="dots" id="pageDots" aria-label="共 8 页"></div>
+    <button class="nav-button nav-button--next" id="nextButton" type="button">下一页 <span aria-hidden="true">→</span></button>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="assets/app.js"></script>
+</body>
+</html>
