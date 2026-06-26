@@ -36,7 +36,7 @@ function updateNavigation() {
   pageNumber.textContent = String(state.page + 1);
   prevButton.disabled = state.page === 0;
   nextButton.disabled = state.page === pages.length - 1;
-  nextButton.innerHTML = state.page === 6 ? '查看来源 <span aria-hidden="true">→</span>' : '下一页 <span aria-hidden="true">→</span>';
+  nextButton.innerHTML = state.page === 6 ? '查看资料依据 <span aria-hidden="true">→</span>' : '下一页 <span aria-hidden="true">→</span>';
   $$("button", dots).forEach((dot, index) => {
     dot.classList.toggle("active", index === state.page);
     dot.setAttribute("aria-current", index === state.page ? "page" : "false");
@@ -92,10 +92,9 @@ function renderSignals() {
 function updateSignalPanel(submitted) {
   const hazards = data.signals.filter((item) => item.hazard).map((item) => item.key);
   const hits = hazards.filter((key) => state.signals.has(key)).length;
-  const level = hits >= 4 ? "Critical" : hits >= 2 ? "Warning" : "Observe";
-  $("#signalCount").textContent = `Risk Signals: ${hits}/4`;
-  $("#signalLevel").textContent = `Status: ${level}`;
-  $("#signalStatus").textContent = `Status: ${level}`;
+  const level = hits >= 4 ? "高度危险" : hits >= 2 ? "需要警惕" : "等待判断";
+  $("#signalCount").textContent = `已识别风险：${hits} 项`;
+  $("#signalLevel").textContent = level;
   $("#signalMark").textContent = hits >= 2 ? "!" : "?";
   $("#phoneScene").classList.toggle("danger", hits >= 2);
   if (submitted) showToast("已记录，可以进入下一页");
@@ -110,11 +109,11 @@ function checkSignals() {
   if (hits === 4 && !pickedWarm) {
     state.signalScore = 30;
     feedback.className = "feedback correct";
-    feedback.innerHTML = "<b>已识别 4/4 个危险信号。</b> 鼓包、异味或异响、停用后持续发烫、喷气冒烟都不是普通发热，应按 warning / critical 状态处理。";
+    feedback.innerHTML = "<b>判断正确。</b> 鼓包、异味或异响、停用后仍持续发烫、喷气冒烟，都不能当成普通发热。";
   } else {
     state.signalScore = Math.max(8, hits * 5 - (pickedWarm ? 2 : 0));
     feedback.className = "feedback partial";
-    feedback.innerHTML = `<b>已识别 ${hits}/4 个危险信号。</b> 轻微温热通常需要结合负载和回落速度判断；误把它等同于鼓包、烟气等信号，会影响处置优先级。`;
+    feedback.innerHTML = `<b>你找到了 ${hits}/4 个关键信号。</b> 轻微温热要结合使用状态判断；鼓包、异味、异响、持续升温和烟气更值得立即警惕。`;
   }
 }
 
@@ -129,7 +128,7 @@ function bindScenarios() {
       $("i", button).textContent = result.label;
       const feedback = $("#scenarioFeedback");
       feedback.className = `feedback feedback--wide ${result.className === "selected" ? "correct" : "partial"}`;
-      feedback.innerHTML = `<b>${result.code}</b> ${result.text}`;
+      feedback.innerHTML = result.text;
     });
   });
 }
@@ -161,7 +160,7 @@ function chooseAction(button) {
 }
 
 function renderSources() {
-  $("#sourceList").innerHTML = data.sources.map((source) => `<li class="source-card"><span class="source-type">${source.type}</span><div><h3>${source.title}</h3><p>${source.org} · ${source.year}</p><p>${source.use}</p><small>${source.url}</small></div><a class="button button--secondary" href="${source.url}" target="_blank" rel="noopener noreferrer">查看来源</a></li>`).join("");
+  $("#sourceList").innerHTML = data.sources.map((source) => `<li class="source-card"><span class="source-type">${source.type}</span><div><h3>${source.title}</h3><p><b>发布机构：</b>${source.org}</p><p><b>年份：</b>${source.year}</p><p><b>用途：</b>${source.use}</p><small>${source.url}</small></div><a class="button button--secondary" href="${source.url}" target="_blank" rel="noopener noreferrer">查看来源</a></li>`).join("");
 }
 
 function totalScore() { return Math.min(100, state.signalScore + state.scenarioScore + state.trendScore + state.actionScore); }
@@ -183,7 +182,7 @@ function resetState() {
   $("#actionOutcome").className = "outcome";
   $("#actionOutcome").innerHTML = '<span>?</span><div><b>等待选择</b><p>你的第一步，会影响接下来的风险。</p></div>';
   $("#scoreValue").textContent = "--";
-  $("#certificateTitle").textContent = "锂电池异常风险识别摘要";
+  $("#certificateTitle").textContent = "锂电池安全提示卡";
   $("#certificateLine").textContent = "完成前面的判断后生成安全提示卡";
   $("#generateCertificate").textContent = "生成安全提示卡";
   const download = $("#downloadCertificate"); download.hidden = true; download.href = "#";
@@ -198,14 +197,14 @@ function generateCertificate() {
   const dataUrl = window.BatteryCertificate.draw(canvas, score);
   const level = window.BatteryCertificate.level(score);
   $("#scoreValue").textContent = String(score);
-  $("#certificateTitle").textContent = "锂电池异常风险识别摘要";
-  $("#certificateLine").textContent = `Risk Awareness Score: ${score} · Level: ${level}`;
+  $("#certificateTitle").textContent = "锂电池安全提示卡";
+  $("#certificateLine").textContent = `安全识别指数：${score} · 等级：${level}`;
   $("#generateCertificate").textContent = "重新生成安全提示卡";
   const download = $("#downloadCertificate"); download.href = dataUrl; download.hidden = false;
   let preview = $("#certificatePreview");
   if (!preview) { preview = document.createElement("img"); preview.id = "certificatePreview"; $("#certificateCard").appendChild(preview); }
   preview.src = dataUrl;
-  preview.alt = `锂电池异常风险识别摘要，风险认知得分 ${score}，等级 ${level}`;
+  preview.alt = `锂电池安全提示卡，安全识别指数 ${score}，等级 ${level}`;
   showToast("安全提示卡 PNG 已生成");
 }
 
@@ -235,3 +234,5 @@ document.addEventListener("keydown", (event) => {
 });
 const initialMatch = location.hash.match(/^#page-(\d)$/);
 if (initialMatch && Number(initialMatch[1]) === 0) goToPage(0);
+
+$$(`[data-jump]`).forEach((button) => button.addEventListener("click", () => goToPage(Number(button.dataset.jump))));
