@@ -21,6 +21,39 @@ function showToast(message) {
   showToast.timer = setTimeout(() => toast.classList.remove("show"), 2200);
 }
 
+function showRuntimeWarning(reason) {
+  const warning = $("#runtimeWarning");
+  if (!warning || !warning.hidden) return;
+  warning.hidden = false;
+  if (reason) warning.dataset.reason = reason;
+}
+
+function verifyRuntimeResources() {
+  if (location.protocol === "file:") {
+    showRuntimeWarning("file-protocol");
+    return;
+  }
+  const requiredImages = [
+    "assets/images/cover-hero.png",
+    "assets/images/signal-device.png",
+    "assets/images/scene-warm.png",
+    "assets/images/scene-bulge.png",
+    "assets/images/scene-hall.png",
+    "assets/images/trend-base.png"
+  ];
+  let settled = false;
+  requiredImages.forEach((src) => {
+    const image = new Image();
+    image.onload = () => {};
+    image.onerror = () => {
+      if (settled) return;
+      settled = true;
+      showRuntimeWarning("asset-load-failed");
+    };
+    image.src = src;
+  });
+}
+
 function buildDots() {
   pages.forEach((page, index) => {
     const button = document.createElement("button");
@@ -48,21 +81,24 @@ function goToPage(index) {
   const oldPage = pages[state.page];
   const newPage = pages[index];
   const forward = index > state.page;
+  pages.forEach((page) => page.classList.remove("page--enter-forward", "page--enter-back", "page--leave-forward", "page--leave-back", "page--leaving"));
   oldPage.classList.remove("page--active");
-  if (!reduceMotion) oldPage.classList.add("page--leaving");
+  if (!reduceMotion) oldPage.classList.add("page--leaving", forward ? "page--leave-forward" : "page--leave-back");
   oldPage.setAttribute("aria-hidden", "true");
   oldPage.inert = true;
   state.page = index;
   state.maxVisited = Math.max(state.maxVisited, index);
-  newPage.classList.remove("page--leaving");
   newPage.classList.add("page--active");
+  if (!reduceMotion) newPage.classList.add(forward ? "page--enter-forward" : "page--enter-back");
   newPage.removeAttribute("aria-hidden");
   newPage.inert = false;
   newPage.scrollTop = 0;
-  newPage.style.animationName = forward ? "pageIn" : "pageInBack";
   location.hash = `page-${index}`;
   updateNavigation();
-  setTimeout(() => oldPage.classList.remove("page--leaving"), 250);
+  setTimeout(() => {
+    oldPage.classList.remove("page--leaving", "page--leave-forward", "page--leave-back");
+    newPage.classList.remove("page--enter-forward", "page--enter-back");
+  }, 440);
   const heading = $("h1, h2", newPage);
   if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
 }
@@ -134,16 +170,176 @@ function bindScenarios() {
 }
 
 const trendSlider = $("#trendSlider");
+const trendSliderShell = $("#trendSliderShell");
 function updateTrend() {
-  const value = Number(trendSlider.value);
-  const item = data.trend[value];
-  $("#trendVisual").dataset.stage = String(value);
+  const rawValue = Number(trendSlider.value);
+  const progress = Math.max(0, Math.min(1, rawValue / Number(trendSlider.max || 300)));
+  const stage = Math.min(3, Math.floor(progress * 4));
+  const item = data.trend[stage];
+  const visual = $("#trendVisual");
+  visual.dataset.stage = String(stage);
+  visual.style.setProperty("--trend-progress", progress.toFixed(3));
+  visual.style.setProperty("--heat-progress", Math.max(0, (progress - .08) / .92).toFixed(3));
+  visual.style.setProperty("--smoke-progress", Math.max(0, (progress - .68) / .32).toFixed(3));
+  trendSliderShell?.style.setProperty("--slider-progress", `${(progress * 100).toFixed(1)}%`);
   $("#trendCode").textContent = item.code;
   $("#trendName").textContent = item.name;
   $("#batteryMark").textContent = item.mark;
   $("#trendText").innerHTML = `<b>${item.title}</b>${item.text}`;
   trendSlider.setAttribute("aria-valuetext", `${item.code}：${item.title}`);
-  if (value === 3) { state.completed[4] = true; state.trendScore = 10; }
+  if (progress >= .96) { state.completed[4] = true; state.trendScore = 10; }
+}
+
+function setTrendFromPointer(event) {
+  const rect = trendSliderShell.getBoundingClientRect();
+  const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+  trendSlider.value = String(Math.round(ratio * Number(trendSlider.max || 300)));
+  updateTrend();
+}
+
+function bindTrendSliderDrag() {
+  if (!trendSliderShell) return;
+  let activePointer = false;
+  const startDrag = (event) => {
+    activePointer = true;
+    try {
+      trendSliderShell.setPointerCapture(event.pointerId);
+    } catch {
+      // Some mobile browsers do not allow capture on the wrapper when the input is the target.
+    }
+    setTrendFromPointer(event);
+    event.preventDefault();
+  };
+  const moveDrag = (event) => {
+    if (!activePointer) return;
+    setTrendFromPointer(event);
+    event.preventDefault();
+  };
+  const endDrag = (event) => {
+    if (!activePointer) return;
+    activePointer = false;
+    if (event.pointerId && trendSliderShell.hasPointerCapture(event.pointerId)) trendSliderShell.releasePointerCapture(event.pointerId);
+  };
+  trendSliderShell.addEventListener("pointerdown", startDrag, { capture: true });
+  window.addEventListener("pointermove", moveDrag, { passive: false });
+  window.addEventListener("pointerup", endDrag);
+  window.addEventListener("pointercancel", endDrag);
+}
+
+function initDotField() {
+  const canvas = $("#appDotField");
+  if (!canvas || reduceMotion) return;
+  const ctx = canvas.getContext("2d", { alpha: true });
+  const dots = [];
+  const mouse = { x: -9999, y: -9999, px: -9999, py: -9999, speed: 0 };
+  const config = {
+    dotRadius: 2.4,
+    dotSpacing: 13,
+    cursorRadius: 320,
+    bulgeStrength: 18,
+    gradientFrom: "rgba(238,112,91,.34)",
+    gradientTo: "rgba(244,151,120,.24)"
+  };
+  let dpr = 1;
+  let width = 0;
+  let height = 0;
+  let raf = 0;
+  let speedTimer = 0;
+  let resizeTimer = 0;
+
+  function buildDots() {
+    dots.length = 0;
+    const step = config.dotRadius + config.dotSpacing;
+    const cols = Math.ceil(width / step) + 1;
+    const rows = Math.ceil(height / step) + 1;
+    const padX = ((width % step) - step) / 2;
+    const padY = ((height % step) - step) / 2;
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const ax = padX + col * step + step / 2;
+        const ay = padY + row * step + step / 2;
+        dots.push({ ax, ay, sx: ax, sy: ay });
+      }
+    }
+  }
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    width = Math.max(1, rect.width);
+    height = Math.max(1, rect.height);
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildDots();
+  }
+
+  function scheduleResize() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 120);
+  }
+
+  function moveMouse(event) {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    mouse.x = event.clientX - rect.left;
+    mouse.y = event.clientY - rect.top;
+  }
+
+  function updateSpeed() {
+    const dx = mouse.x - mouse.px;
+    const dy = mouse.y - mouse.py;
+    const dist = Math.hypot(dx, dy);
+    mouse.speed += (Math.min(dist / 9, 1) - mouse.speed) * .18;
+    if (mouse.speed < .004) mouse.speed = 0;
+    mouse.px = mouse.x;
+    mouse.py = mouse.y;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+    const gradient = ctx.createLinearGradient(0, 0, width, height);
+    gradient.addColorStop(0, config.gradientFrom);
+    gradient.addColorStop(1, config.gradientTo);
+    ctx.fillStyle = gradient;
+    const radius = config.dotRadius * .5;
+    const cursorSq = config.cursorRadius * config.cursorRadius;
+    const engagement = mouse.speed;
+
+    ctx.beginPath();
+    for (const dot of dots) {
+      const dx = mouse.x - dot.ax;
+      const dy = mouse.y - dot.ay;
+      const distSq = dx * dx + dy * dy;
+      if (distSq < cursorSq && engagement > .01) {
+        const dist = Math.sqrt(distSq) || 1;
+        const t = 1 - dist / config.cursorRadius;
+        const push = t * t * config.bulgeStrength * engagement;
+        dot.sx += (dot.ax - (dx / dist) * push - dot.sx) * .12;
+        dot.sy += (dot.ay - (dy / dist) * push - dot.sy) * .12;
+      } else {
+        dot.sx += (dot.ax - dot.sx) * .08;
+        dot.sy += (dot.ay - dot.sy) * .08;
+      }
+      ctx.moveTo(dot.sx + radius, dot.sy);
+      ctx.arc(dot.sx, dot.sy, radius, 0, Math.PI * 2);
+    }
+    ctx.fill();
+    raf = requestAnimationFrame(draw);
+  }
+
+  resize();
+  speedTimer = window.setInterval(updateSpeed, 32);
+  window.addEventListener("resize", scheduleResize);
+  window.addEventListener("pointermove", moveMouse, { passive: true });
+  raf = requestAnimationFrame(draw);
+
+  window.addEventListener("pagehide", () => {
+    cancelAnimationFrame(raf);
+    clearInterval(speedTimer);
+    clearTimeout(resizeTimer);
+  }, { once: true });
 }
 
 const actionButtons = $$('[data-action]');
@@ -165,6 +361,12 @@ function renderSources() {
 
 function totalScore() { return Math.min(100, state.signalScore + state.scenarioScore + state.trendScore + state.actionScore); }
 
+function scoreLevel(score) {
+  if (score >= 90) return "safe";
+  if (score >= 70) return "warning";
+  return "danger";
+}
+
 function resetState() {
   state.maxVisited = 0;
   state.completed = [true, true, false, false, false, false, true, true];
@@ -182,6 +384,7 @@ function resetState() {
   $("#actionOutcome").className = "outcome";
   $("#actionOutcome").innerHTML = '<span>?</span><div><b>等待选择</b><p>你的第一步，会影响接下来的风险。</p></div>';
   $("#scoreValue").textContent = "--";
+  $("#scoreRing").dataset.level = "danger";
   $("#certificateTitle").textContent = "锂电池安全提示卡";
   $("#certificateLine").textContent = "完成前面的判断后生成安全提示卡";
   $("#generateCertificate").textContent = "生成安全提示卡";
@@ -191,24 +394,36 @@ function resetState() {
   goToPage(0); showToast("已清空记录，重新开始");
 }
 
-function generateCertificate() {
+async function generateCertificate() {
   const score = totalScore();
   const canvas = $("#certificateCanvas");
-  const dataUrl = window.BatteryCertificate.draw(canvas, score);
-  const level = window.BatteryCertificate.level(score);
-  $("#scoreValue").textContent = String(score);
-  $("#certificateTitle").textContent = "锂电池安全提示卡";
-  $("#certificateLine").textContent = `安全识别指数：${score} · 等级：${level}`;
-  $("#generateCertificate").textContent = "重新生成安全提示卡";
-  const download = $("#downloadCertificate"); download.href = dataUrl; download.hidden = false;
-  let preview = $("#certificatePreview");
-  if (!preview) { preview = document.createElement("img"); preview.id = "certificatePreview"; $("#certificateCard").appendChild(preview); }
-  preview.src = dataUrl;
-  preview.alt = `锂电池安全提示卡，安全识别指数 ${score}，等级 ${level}`;
-  showToast("安全提示卡 PNG 已生成");
+  const button = $("#generateCertificate");
+  try {
+    button.disabled = true;
+    button.textContent = "正在生成...";
+    const dataUrl = await window.BatteryCertificate.draw(canvas, score);
+    const level = window.BatteryCertificate.level(score);
+    $("#scoreValue").textContent = String(score);
+    $("#scoreRing").dataset.level = scoreLevel(score);
+    $("#certificateTitle").textContent = "锂电池安全提示卡";
+    $("#certificateLine").textContent = `安全识别指数：${score} · 等级：${level}`;
+    button.textContent = "重新生成安全提示卡";
+    const download = $("#downloadCertificate"); download.href = dataUrl; download.hidden = false;
+    let preview = $("#certificatePreview");
+    if (!preview) { preview = document.createElement("img"); preview.id = "certificatePreview"; $("#certificateCard").appendChild(preview); }
+    preview.src = dataUrl;
+    preview.alt = `锂电池安全提示卡，安全识别指数 ${score}，等级 ${level}`;
+    showToast("安全提示卡 PNG 已生成");
+  } catch (error) {
+    console.error(error);
+    button.textContent = "重新生成安全提示卡";
+    showToast("生成失败，请刷新页面后重试");
+  } finally {
+    button.disabled = false;
+  }
 }
 
-buildDots(); renderSignals(); renderSources(); bindScenarios(); updateNavigation(); updateSignalPanel(false); updateTrend();
+buildDots(); renderSignals(); renderSources(); bindScenarios(); bindTrendSliderDrag(); initDotField(); verifyRuntimeResources(); updateNavigation(); updateSignalPanel(false); updateTrend();
 prevButton.addEventListener("click", () => goToPage(state.page - 1));
 nextButton.addEventListener("click", tryNext);
 $$('[data-next]').forEach((button) => button.addEventListener("click", tryNext));
