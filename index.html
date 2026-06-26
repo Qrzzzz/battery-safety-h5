@@ -14,11 +14,17 @@
     <button class="brand" id="homeButton" type="button" aria-label="回到封面"><span class="brand-battery" aria-hidden="true"></span><span>失控之前</span></button>
     <div class="page-status" aria-live="polite"><span>当前页：<b id="pageName">封面</b></span><strong><span id="pageNumber">1</span> / 8</strong></div>
   </header>
+  <div class="runtime-warning" id="runtimeWarning" role="status" aria-live="polite" hidden>
+    <b>资源可能无法完整加载</b>
+    <span>建议通过本地 HTTP 服务或 <a href="https://qrzzzz.github.io/battery-safety-h5/" target="_blank" rel="noopener noreferrer">GitHub Pages</a> 打开本作品，而不是直接双击 index.html。</span>
+    <code>python -m http.server 4173 --bind 127.0.0.1</code>
+  </div>
 
   <main id="app">
+    <div class="app-dot-field" aria-hidden="true"><canvas id="appDotField"></canvas></div>
     <section class="page page--active page--cover" id="page-0" data-page="0" data-title="封面" aria-labelledby="title-0">
       <div class="cover-copy">
-        <p class="eyebrow">锂电池安全互动科普 <small>SAFETY GUIDE</small></p>
+        <p class="eyebrow cover-kicker">锂电池安全互动科普 <small>SAFETY GUIDE</small><span class="cover-time">预计用时：4 分钟</span></p>
         <h1 id="title-0">在电池<br>失控之前</h1>
         <p class="lead">鼓包、异味、持续发烫、冒烟——这些信号不能靠“再用一会儿”来验证。用几分钟，学会判断什么时候该停用、远离和求助。</p>
         <p class="entry-info">第十七届安徽省百所高校百万大学生科普创意创新大赛参赛作品</p>
@@ -26,7 +32,6 @@
       </div>
       <div class="life-scene cover-visual" aria-label="宿舍桌面上的手机、充电宝、数据线和插线板场景" role="img">
         <div class="book"></div><div class="power-strip"><i></i><i></i><i></i></div><div class="cable"></div><div class="phone-device"><span></span></div><div class="bank-device"><span>轻微鼓包</span></div><div class="heat-spot"></div>
-        <div class="scene-note"><p><b>当前状态：</b>正常</p><p><b>风险提示：</b>注意异常变化</p><p><b>预计用时：</b>4 分钟</p></div>
       </div>
     </section>
 
@@ -49,7 +54,7 @@
 
     <section class="page" id="page-4" data-page="4" data-title="升温趋势" aria-labelledby="title-4" aria-hidden="true" inert>
       <div class="page-copy page-copy--compact"><p class="eyebrow">04 趋势判断 <small>THERMAL RISK</small></p><h2 id="title-4">别背温度数字，要看变化趋势</h2><p>不同电池的材料、结构和状态不同，没有一个温度值能替所有电池划出统一安全线。更重要的是：异常是否持续、是否叠加其他信号。</p></div>
-      <div class="trend-lab"><div class="trend-visual" id="trendVisual" data-stage="0" aria-label="桌面设备热区变化图"><div class="table-device"><span id="batteryMark">✓</span></div><div class="trend-heat"></div><div class="smoke"><i></i><i></i><i></i></div><b class="keep-away">不要靠近</b></div><div class="trend-control"><div class="trend-title"><span id="trendCode">阶段 1</span><b id="trendName">正常温热</b></div><label class="sr-only" for="trendSlider">模拟电池升温过程</label><input id="trendSlider" type="range" min="0" max="3" value="0" step="1" aria-describedby="trendText"><div class="trend-scale" aria-hidden="true"><span>正常温热</span><span>出现异常</span><span>持续升温</span><span>烟气或明火</span></div><p id="trendText"><b>保持通风</b>使用或充电时轻微温热并不少见。保持通风，不要用被褥、衣物盖住设备。</p><p class="source-hint">说明：这里演示的是变化趋势，不对应统一温度阈值。</p></div></div>
+      <div class="trend-lab"><div class="trend-visual" id="trendVisual" data-stage="0" aria-label="桌面设备热区变化图"><div class="thermal-aura" aria-hidden="true"></div><div class="table-device"><span id="batteryMark">✓</span></div><div class="trend-heat"></div><div class="smoke"><i></i><i></i><i></i></div><b class="keep-away">不要靠近</b></div><div class="trend-control"><div class="trend-title"><span id="trendCode">阶段 1</span><b id="trendName">正常温热</b></div><label class="sr-only" for="trendSlider">模拟电池升温过程</label><div class="trend-slider-shell" id="trendSliderShell"><input id="trendSlider" type="range" min="0" max="300" value="0" step="1" aria-describedby="trendText"></div><div class="trend-scale" aria-hidden="true"><span>正常温热</span><span>出现异常</span><span>持续升温</span><span>烟气或明火</span></div><p id="trendText"><b>保持通风</b>使用或充电时轻微温热并不少见。保持通风，不要用被褥、衣物盖住设备。</p><p class="source-hint">说明：这里演示的是变化趋势，不对应统一温度阈值。</p></div></div>
     </section>
 
     <section class="page" id="page-5" data-page="5" data-title="安全处置" aria-labelledby="title-5" aria-hidden="true" inert>
